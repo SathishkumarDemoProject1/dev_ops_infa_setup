@@ -29,7 +29,7 @@ resource "aws_security_group" "jenkins_sg" {
     from_port        = 9000
     to_port          = 9000
     protocol         = "tcp"
-    cidr_blocks      = ["172.31.0.0/16"]
+    cidr_blocks      = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -61,5 +61,17 @@ resource "aws_instance" "jenkins_master" {
   user_data       = "${file("install_jenkins.sh")}"
   tags = {
     Name = "Jenkins Master"
+  }
+}
+
+
+resource "aws_instance" "sonar_machine" {
+  ami             = "ami-05fa00d4c63e32376"
+  instance_type   = "t3.medium"
+  key_name        = "terraform_key"
+  security_groups = [aws_security_group.jenkins_sg.name]
+  user_data       = "${file("install_sonar.sh")}"
+  tags = {
+    Name = "SonarQube Server"
   }
 }
